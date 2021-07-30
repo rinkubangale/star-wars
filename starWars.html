@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Wars</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body{
+            margin: 10% 0% 0% 50%;
+            background-image: url("https://i.pinimg.com/originals/ca/82/12/ca82125c0ec71105aa02ee3730ecccbc.gif");
+            background-size: 100% 100vh;
+        }
+        input {
+            margin-left: 40%;
+            color: white;
+            border: 1px solid black;
+            border-style: hidden;
+            border-bottom: 1px solid white;
+            background: rgba(0, 0, 0, 0.5);
+            width: 290px;
+            height: 50px;
+            font-size: 18px;
+            border-radius: 25px 25px 0% 0%;
+            padding-left: 20px;
+        }
+        input:focus{
+            outline: none;
+            color: white;
+        }
+
+        body > img{
+            margin-top: -80px;
+            margin-left: 43%;
+            width: 40%;
+        }
+
+        #movies {
+            margin-left: 40%;
+            border-radius: 0% 0% 5% 5%;
+            color: white;
+            width: 304px;
+            height: 200px;
+            /* border: 1px solid black; */
+            padding-left: 10px;
+            border-top: none;
+            overflow: auto;
+        }
+        ::-webkit-scrollbar{
+            width: 5px;
+            margin-right: 10px;
+        }
+        ::-webkit-scrollbar-thumb{
+            background: grey;
+            border-radius: 50px;
+        }
+        ::-webkit-scrollbar-track{
+            box-shadow: inset 0 0 5px grey;
+            border-radius: 50px;
+        }
+        .material-icons{
+            cursor: pointer;
+            margin-left: -50px;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <img src="https://www.mikeanddenises.com/wp-content/uploads/2018/04/star-wars-logo-981.png" /><br>
+    <input oninput="throttle()" type="text" id="query" placeholder="Search..." />
+    <span class="material-icons" id="close">close</span>
+    <div id="movies"></div>
+
+</body>
+
+<script>
+
+    let movies_div = document.getElementById("movies");
+
+    var timerId;
+
+    let cross = document.getElementById("close");
+
+    cross.addEventListener("click",()=>{
+        movies_div.innerHTML = null;
+        document.getElementById("query").value = null;
+        console.log("hi");
+    })
+
+
+    async function searchMovies() {
+
+        let seachX = document.querySelector("input").value;
+
+        if (seachX.length <= 2) {
+            return false;
+        }
+
+        let res = await fetch(`https://swapi.dev/api/people/?search=${seachX}`)
+
+        let data = await res.json()
+        console.log("data:", data);
+
+        appendMovies(data.results);
+
+        // return data.results
+    }
+
+
+    function throttle() {
+
+        if (timerId) {
+            // console.log("hi");
+            return;
+        }
+
+        timerId = setTimeout(() => {
+            // main();
+            searchMovies();
+            timerId = undefined;
+        }, 2000);
+
+        // console.log(timerId);
+
+    }
+
+    function appendMovies(d) {
+        movies_div.innerHTML = null;
+
+        if(d.length == 0){
+            let p = document.createElement("p");
+            p.innerHTML = "No Result Found !!";
+            p.style.fontSize = "15px"
+
+            let i = document.createElement("img");
+            i.src = "https://cdn0.iconfinder.com/data/icons/files-34/128/25_file_types_set_5-04-512.png";
+            i.style.width = "150px"
+            i.style.marginLeft = "20%"
+            movies_div.style.background = "rgba(0, 0, 0, 0.5)";
+            movies_div.append(p,i);
+            return;
+        }
+
+        d.forEach(({ name, gender, birth_year}) => {
+            let p_div = document.createElement("div")
+
+            let p = document.createElement("p");
+            p.innerHTML = name;
+            // d.style.fontSize = "20px"
+            p.style.fontWeight = "550"
+            p.addEventListener("mouseover",()=>{
+                p.style.color = "gold"
+            })
+            p.addEventListener("mouseout", () => {
+                p.style.color = "white"
+            })
+
+            let d = document.createElement("p");
+            d.innerHTML = gender;
+            d.style.fontSize = "14px"
+
+            let b = document.createElement("p");
+            b.innerHTML = birth_year;
+            b.style.fontSize = "14px"
+
+            p_div.append(p, d, b);
+            p_div.style.display = "grid";
+            p_div.style.gridTemplateColumns = "auto auto auto"
+
+            movies_div.append(p_div);
+            movies_div.style.background = "rgba(0, 0, 0, 0.5)";
+        })
+    }
+
+    // async function main() {
+    //     let movies = await searchMovies();
+
+    // }
+
+
+
+
+</script>
+
+</html>
